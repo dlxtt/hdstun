@@ -91,10 +91,10 @@ ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 def _initialize():
     items = dictAttrToVal.items()
     for i in xrange(len(items)):
-        dictValToAttr.update({items[i][1]: items[i][0]})
+        dictValToAttr.update({list(items)[i][1]: list(items)[i][0]})
     items = dictMsgTypeToVal.items()
     for i in xrange(len(items)):
-        dictValToMsgType.update({items[i][1]: items[i][0]})
+        dictValToMsgType.update({list(items)[i][1]: list(items)[i][0]})
 
 
 def gen_tran_id():
@@ -135,9 +135,9 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                 else:
                     retVal['Resp'] = False
                     return retVal
-        msgtype = binascii.b2a_hex(buf[0:2])
+        msgtype = bytes.decode(binascii.b2a_hex(buf[0:2]))
         bind_resp_msg = dictValToMsgType[msgtype] == "BindResponseMsg"
-        tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).upper()
+        tranid_match = tranid.upper() == bytes.decode(binascii.b2a_hex(buf[4:20]).upper())
         if bind_resp_msg and tranid_match:
             recvCorr = True
             retVal['Resp'] = True
@@ -145,7 +145,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             len_remain = len_message
             base = 20
             while len_remain:
-                attr_type = binascii.b2a_hex(buf[base:(base + 2)])
+                attr_type = bytes.decode(binascii.b2a_hex(buf[base:(base + 2)]))
                 attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]),
                                16)
                 if attr_type == MappedAddress:  # first two bytes: 0x0001
